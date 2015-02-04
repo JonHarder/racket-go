@@ -26,6 +26,12 @@ Racket-go
 
 Enter move Black: D4
 ```
+* What works:
+  - placing stones
+  - alternating turns
+  - passing
+  - exiting
+  - collision detection (sorta)
 
 * TODO:
   - make move parsing more robust
