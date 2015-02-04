@@ -39,17 +39,13 @@ go [ <option> ... ]
 ```
 
 # What works:
-  - placing stones
+  - robust move parsing
   - alternating turns
   - saving/loading
-  - passing
-  - exiting
-  - collision detection (sorta)
-  - loading/saving (doesnt keep track of turn yet)
+  - metacommands ex. pass, save, exit
+  - collision detection
 
 # TODO:
-  - make move parsing more robust
   - add group/capture logic
-  - add command line flags for things like loading a previous
     game, changing names of players, etc.
-  - fix collisions from changing turn
+  - A.I. (at least rudimentary)

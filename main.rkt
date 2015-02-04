@@ -17,7 +17,7 @@
     (if (equal? 'empty cur-piece)
         ; return new board with piece at point
         (board-set board actual-move piece)
-        board)))
+        #f)))
 
 
 (define (save-game board player [location #f])
@@ -55,8 +55,11 @@
       [(equal? move 'save) (save-game board player)]
       [(equal? move 'exit) (printf "Bye!\n")]
       [(equal? move 'pass) (play board (next-turn player))]
-      [else (let ([board (place-piece board move player)])
-              (play board (next-turn player)))])))
+      [else (let ([new-board (place-piece board move player)])
+              (if new-board
+                  (play new-board (next-turn player))
+                  (begin (printf "Invalid move, try again\n")
+                         (play board player))))])))
 
 (define (start-game)
   (if (load-game-file?)
