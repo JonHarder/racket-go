@@ -33,8 +33,7 @@
 (define (get-move player)
   (printf "Enter move ~a: " (display-player player))
   (let ([raw-response (read)])
-    (if (or (equal? raw-response 'exit)
-            (equal? raw-response 'pass))
+    (if (member raw-response '(exit pass save))
         raw-response
         (let ([move (parse-move raw-response)])
           (if (not (legal? move))

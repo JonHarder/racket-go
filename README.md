@@ -32,8 +32,9 @@ Enter move Black: D4
   - passing
   - exiting
   - collision detection (sorta)
+  - loading/saving (doesnt keep track of turn yet)
 
 * TODO:
   - make move parsing more robust
-  - add save/load feature
+  - ~~add save/load feature~~
   - add group/capture logic
