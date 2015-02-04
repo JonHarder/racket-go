@@ -49,9 +49,6 @@
 
 (define (print-board board)
   (printf "   A B C D E F G H I J K L M N O P Q R S\n")
-  (for-each (lambda (n)
-              (if (member n '(4 10 16))
-                  (print-row n (list-ref board n))
-                  (print-row n (list-ref board n))))
+  (for-each (lambda (n) (print-row n (list-ref board n)))
             (range 18 -1 -1))
   (printf "   A B C D E F G H I J K L M N O P Q R S\n"))

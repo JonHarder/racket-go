@@ -26,3 +26,8 @@ Racket-go
 
 Enter move Black: D4
 ```
+
+* TODO:
+  - make move parsing more robust
+  - add save/load feature
+  - add group/capture logic

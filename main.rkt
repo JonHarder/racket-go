@@ -36,10 +36,6 @@
       [(equal? move 'pass) (play board (next-turn turn))]
       [else (let ([board (place-piece board move player)])
               (play board (next-turn turn)))])))
-    ;; (if (equal? move 'exit)
-    ;;     (printf "Bye!\n")
-    ;;     (let ([board (place-piece board move player)])
-    ;;       (play board (next-turn turn))))))
 
 (define (start-game)
   (play initial-board 0))
