@@ -18,7 +18,7 @@ Racket-go
  7 . . . . . . . . . . . . . . . . . .  7
  6 . . . . . . . . . . . . . . . . . .  6
  5 . . . . . . . . . . . . . . . . . .  5
- 4 . . . + . . . . . + . . . . + . . .  4
+ 4 . . . X . . . . . + . . . . + . . .  4
  3 . . . . . . . . . . . . . . . . . .  3
  2 . . . . . . . . . . . . . . . . . .  2
  1 . . . . . . . . . . . . . . . . . .  1
@@ -38,3 +38,5 @@ Enter move Black: D4
   - make move parsing more robust
   - ~~add save/load feature~~
   - add group/capture logic
+  - add command line flags for things like loading a previous
+    game, changing names of players, etc.

@@ -20,38 +20,37 @@
         board)))
 
 
-(define (save-game board turn)
+(define (save-game board player)
   (let ([home (find-system-path 'home-dir)])
-    (display-to-file board "/home/jharder/go.save")))
+    (display-to-file board "/home/jharder/go.save" #:exists 'replace)))
 
 
 (define (load-game [path "/home/jharder/go.save"])
   (file->value path))
 
 
-(define player-seq '(black white))
+(define (next-turn player)
+  (cond
+    [(equal? player 'black) 'white]
+    [(equal? player 'white) 'black]))
 
-(define (next-turn turn)
-  (remainder (+ 1 turn) 2))
 
-(define (play board turn)
+(define (play board player)
   (newline)
   (print-board board)
   (newline)
-  (let* ([player (list-ref player-seq turn)]
-         [move (get-move player)])
+  (let ([move (get-move player)])
     (cond
       [(equal? move 'save) (begin
                              (printf "Saving game...\n")
-                             (save-game board turn)
+                             (save-game board player)
                              (printf "Game saved, Bye!\n"))]
       [(equal? move 'exit) (printf "Bye!\n")]
-      [(equal? move 'pass) (play board (next-turn turn))]
+      [(equal? move 'pass) (play board (next-turn player))]
       [else (let ([board (place-piece board move player)])
-              (play board (next-turn turn)))])))
+              (play board (next-turn player)))])))
 
 (define (start-game)
-  (play initial-board 0))
+  (play initial-board 'black))
 
-; (start-game)
-(print-board (load-game))
+(start-game)
