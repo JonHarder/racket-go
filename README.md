@@ -1,5 +1,4 @@
-Racket-go
-=========
+# Racket-go
 
 ```
    A B C D E F G H I J K L M N O P Q R
@@ -26,22 +25,9 @@ Racket-go
 
 Enter move Black: D4
 ```
-* What works:
-  - placing stones
-  - alternating turns
-  - passing
-  - exiting
-  - collision detection (sorta)
-  - loading/saving (doesnt keep track of turn yet)
 
-* TODO:
-  - make move parsing more robust
-  - ~~add save/load feature~~
-  - add group/capture logic
-  - add command line flags for things like loading a previous
-    game, changing names of players, etc.
-  - fix collisions from changing turn
-* Usage:
+# Usage:
+
 ```
 go [ <option> ... ]
  where <option> is one of
@@ -51,3 +37,19 @@ go [ <option> ... ]
  Multiple single-letter switches can be combined after one `-'; for
   example: `-h-' is the same as `-h --'
 ```
+
+# What works:
+  - placing stones
+  - alternating turns
+  - saving/loading
+  - passing
+  - exiting
+  - collision detection (sorta)
+  - loading/saving (doesnt keep track of turn yet)
+
+# TODO:
+  - make move parsing more robust
+  - add group/capture logic
+  - add command line flags for things like loading a previous
+    game, changing names of players, etc.
+  - fix collisions from changing turn
