@@ -20,13 +20,20 @@
         board)))
 
 
-(define (save-game board player)
-  (let ([home (find-system-path 'home-dir)])
-    (display-to-file board "/home/jharder/go.save" #:exists 'replace)))
+(define (save-game board player [location #f])
+  (if location
+      (display-to-file board location #:exists 'replace)
+      (let* ([home (find-system-path 'home-dir)]
+             [path (string-append (path->string home) "go.save")])
+        (display-to-file board path #:exists 'replace))))
 
 
-(define (load-game [path "/home/jharder/go.save"])
-  (file->value path))
+(define (load-game [path #f])
+  (if (not path)
+      (let* ([homepath (find-system-path 'home-dir)]
+             [filepath (string-append (path->string homepath) "go.save")])
+        (file->value filepath))
+      (file->value path)))
 
 
 (define (next-turn player)
