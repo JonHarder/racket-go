@@ -20,12 +20,12 @@
    color as at the point given which are connected to said
    piece
 
-           1 2 3 4 5
-           . . X X . 5
-           . O X . . 4
-   board = . X X XO. 3
-           . O . OO. 2
-           . . . . . 1
+           O P Q R S
+           . . X X . 19
+           . O X . . 18
+   board = . X X XO. 17
+           . O . OO. 16
+           . . . . . 15
 
    (get-connected board '(3 . 3)) 
 
