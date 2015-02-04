@@ -40,3 +40,14 @@ Enter move Black: D4
   - add group/capture logic
   - add command line flags for things like loading a previous
     game, changing names of players, etc.
+  - fix collisions from changing turn
+* Usage:
+```
+go [ <option> ... ]
+ where <option> is one of
+  -l <file>, --load <file> : Load save file to continue previous game
+  --help, -h : Show this help
+  -- : Do not treat any remaining argument as a switch (at this level)
+ Multiple single-letter switches can be combined after one `-'; for
+  example: `-h-' is the same as `-h --'
+```
