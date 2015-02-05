@@ -34,17 +34,3 @@
   "returns true if placing your stone at the specified point
    is suicidal"
   #f)
-
-
-(define (liberties-of board point)
-  "functionality is incorrect. must check all adjacent, like colored
-   pieces and find total liberties"
-  (let* ([x (car point)]
-         [y (cdr point)]
-         [above `(,x . ,(+ 1 y))]
-         [left `(,(- x 1) . ,y)]
-         [right `(,(+ 1 x) . ,y)]
-         [below `(,x . ,(- y 1))])
-    (filter (lambda (point)
-              (equal? 'empty (board-ref board point)))
-            (list above left right below))))
