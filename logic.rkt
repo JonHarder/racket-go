@@ -61,7 +61,8 @@
   (remove-duplicates (flatten1 complex-list)))
 
 
-;;; thread-through :: a -> (a -> a) -> Int -> a
+;;; should be able to accomplish this with a fold
+;;; thread-through :: a -> (a -> b -> a) -> [a] -> a
 (define (thread-through val fun args)
   (if (eq? (length args) 0)
       val
@@ -73,32 +74,38 @@
   (let ([pieces (get-connected board point)])
     (thread-through board remove-piece pieces)))
 
+
 ;;; find the liberties for the current piece, and all adjacent pieces
 ;;; of the current pieces color, then recursively call get-liberties of
 ;;; those adjacent pieces, adding the liberties found therin to the list
-
 (define (get-liberties board point)
   (let ([pieces (get-connected board point)])
     (filter (lambda (p) (equal? (board-ref board p) 'empty))
             (squash (map (lambda (p) (adjacent-points board p)) pieces)))))
 
 
+
 (define (get-connected board point [found-pieces '()])
   "recursivly finds all connected stones, finding the whole group"
-  (let* ([player (board-ref board point)]
-         [adjacent (adjacent-points board point)]
-         [pieces (filter (lambda (p) (equal? player (board-ref board p))) adjacent)])
-    (if (member point found-pieces)
-        found-pieces
-        (squash (map (lambda (p) (get-connected board p (cons point found-pieces))) pieces)))))
+  ;; (if (equal? (board-ref board point) 'empty)
+  ;;     '()
+      (let* ([player (board-ref board point)]
+             [adjacent (adjacent-points board point)]
+             [pieces (filter (lambda (p) (equal? player (board-ref board p))) adjacent)])
+        (if (member point found-pieces)
+            found-pieces
+            (squash (cons point (map (lambda (p) (get-connected board p (cons point found-pieces))) pieces))))))
 
 
-;; TODO: Doesnt actually work
+;; TODO: alyas true
 (define (suicide? board point player)
   "returns true if placing your stone at the specified point
    is suicidal"
   ;; place piece, get length of get-liberties, unplace piece
-  (eq? (length (get-liberties board point) 0)))
+  (let ([new-board (board-set board point player)])
+    ;; (print-board new-board)))
+    ;; (printf "~a liberties\n" (length (get-liberties new-board point)))))
+    (eq? 0 (length (get-liberties new-board point)))))
 
 (define (ko? board point piece)
   #f)
