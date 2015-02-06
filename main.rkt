@@ -2,7 +2,6 @@
 
 (require "move.rkt")
 (require "board.rkt")
-(require "logic.rkt")
 
 (define (letter->number letter)
   (let* ([letter-list (map string (string->list "ABCDEFGHIJKLMNOPQRS"))]

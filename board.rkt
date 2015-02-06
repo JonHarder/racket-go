@@ -1,6 +1,11 @@
 #lang racket
 
 ;; board.rkt
+
+;; need to be consistent with possible placing of pieces. some functions
+;; rely on possible piece already being there, some put it there for you
+;; and then check.  Need to decide which one to stick with.
+
 (provide (all-defined-out))
 
 (define initial-board (make-list 19 (make-list 19 'empty)))
@@ -44,12 +49,25 @@
    with the new value in its place"
   (append (take dat at) (list val) (drop dat (+ 1 at))))
 
+
 (define (board-set board point piece)
   (let* ([x (car point)]
          [y (cdr point)]
-         [new-board (assoc board y (assoc (list-ref board y) x piece))])
-    (apply-logic new-board point piece)))
+         [new-board (place-stone board point piece)]
+         [result (apply-logic new-board point piece)])
+    ;; if you can successfully place the piece, return the new board
+    ;; as a result of doing so, if placing the piece was unsuccessful
+    ;; due to ko or suicide etc. dont place the piece and return the board
+    ;; unchanged
+    (if (cdr result)
+        (car result)
+        board)))
 
+
+(define (place-stone board point piece)
+  (let* ([x (car point)]
+         [y (cdr point)])
+    (assoc board y (assoc (list-ref board y) x piece))))
 
 
 (define (print-board board)
@@ -100,6 +118,7 @@
       val
       (thread-through (fun val (car args)) fun (cdr args))))
 
+
 (define (capture board point)
   "removes the piece and all connected pieces (if any)
    from the board, returning the new board without those pieces"
@@ -133,6 +152,15 @@
   (let ([new-board (board-set board point player)])
     (eq? 0 (length (get-liberties new-board point)))))
 
+
+(define (capturable? board point piece)
+  "returns false if no capturable groups
+   are made from placing piece at point,
+   otherwise returns a single point on which
+   the group lies on"
+  #f)
+
+
 ;; might need to keep state of board around for a few iterations
 ;; otherwise cant access previous board state
 (define (ko? board point piece)
@@ -165,4 +193,14 @@
 ;;;     then invalid
 ;;; else valid
 (define (apply-logic board point piece)
-  board)
+  "called by board-set; applies all applicable game logic then returns a
+   either the new board as a result of placing the piece and optionally
+   capturing opposing pieces, or false, stating the move was invalid"
+  (if (ko? board point piece)
+      #f
+      (let ([capture-group (capturable? board point piece)])
+        (if capture-group
+            (cons (capture board capture-group) #t)
+            (if (suicide? board point piece)
+                #f
+                (cons (place-stone board point piece) #t))))))
