@@ -25,19 +25,21 @@
   (if location
       (display-to-file (list player board) location #:exists 'replace)
       (let* ([home (find-system-path 'home-dir)]
-             [path (string-append (path->string home) "go.save")])
+             [path (build-path home "go.save")])
         (display-to-file (list player board) path #:exists 'replace)))
   (printf "Done saving game.\n"))
 
 
 (define (load-game [path #f])
   "takes (optional) file path and returns (list player board)"
-  (printf "Loading save from \"~a\"\n" path)
   (if (not path)
-      (let* ([homepath (find-system-path 'home-dir)]
-             [filepath (string-append (path->string homepath) "go.save")])
+      (let* ([home (find-system-path 'home-dir)]
+             [filepath (build-path home "go.save")])
+        (printf "Loading save from \"~a\"\n" filepath)
         (file->value filepath))
-      (file->value path)))
+      (begin
+        (printf "Loading save from \"~a\"\n" path)
+        (file->value path))))
 
 
 (define (next-turn player)
@@ -78,4 +80,5 @@
     (load-game-file? file)]))
 
 ;;;;;;;;;;;;; run game ;;;;;;;;;;;;;;;;;;
-(start-game)
+; (start-game)
+
