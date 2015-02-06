@@ -55,12 +55,23 @@
                      [else (cons l acc)])))
 
 
-
 (define (squash complex-list)
   "takes a arbitrarily nested list of pairs and flattens them
    down to a flat list, removing duplicates"
   (remove-duplicates (flatten1 complex-list)))
 
+
+;;; thread-through :: a -> (a -> a) -> Int -> a
+(define (thread-through val fun args)
+  (if (eq? (length args) 0)
+      val
+      (thread-through (fun val (car args)) fun (cdr args))))
+
+(define (capture board point)
+  "removes the piece and all connected pieces (if any)
+   from the board, returning the new board without those pieces"
+  (let ([pieces (get-connected board point)])
+    (thread-through board remove-piece pieces)))
 
 ;;; find the liberties for the current piece, and all adjacent pieces
 ;;; of the current pieces color, then recursively call get-liberties of

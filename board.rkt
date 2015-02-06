@@ -27,6 +27,8 @@
                                 #:before-first number-buf
                                 #:after-last (string-append " " number-buf)))))
 
+(define (remove-piece board point)
+  (board-set board point 'empty))
 
 (define (board-ref board point)
   (let ([x (car point)]
