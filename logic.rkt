@@ -11,20 +11,23 @@
   "takes a board, a point and a player, returns the set of orthoginal
    points on the board relative to the point which are the same type
    of piece as the player"
-  (let* ([x (car point)]
-         [y (cdr point)]
-         [above `(,x . ,(+ 1 y))]
-         [left `(,(- x 1) . ,y)]
-         [right `(,(+ 1 x) . ,y)]
-         [below `(,x . ,(- y 1))])
-    (apply set (filter (lambda (p) (equal? player p))
-                       (map (lambda (p) (board-ref board p))
-                            (list above left right below))))))
+  (when (pair? point)
+    (let* ([x (car point)]
+           [y (cdr point)]
+           [above `(,x . ,(+ 1 y))]
+           [left `(,(- x 1) . ,y)]
+           [right `(,(+ 1 x) . ,y)]
+           [below `(,x . ,(- y 1))])
+      (apply set (filter (lambda (p)
+                           (equal? player (board-ref board p)))
+                         (list above left right below))))))
+
 
 (define (get-connected board point)
   (let ([connected (adjacent-pieces board point
                                     (board-ref board point))])
-    (set-map connected get-connected)))
+    ; currently an infinite loop, need to check if pieces is in set already
+    (set-map connected (lambda (p) (get-connected board p)))))
 
 
 (define (suicide? board move player)

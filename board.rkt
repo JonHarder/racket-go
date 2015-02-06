@@ -32,7 +32,7 @@
   (let ([x (car point)]
         [y (cdr point)])
     (when (and (< x 19) (< y 19)
-             (>= x 0) (>= y 0))
+               (>= x 0) (>= y 0))
         (list-ref (list-ref board y) x))))
 
 (define (assoc dat at val)

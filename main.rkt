@@ -59,7 +59,10 @@
       [(equal? move 'pass) (play board (next-turn player))]
       [else (let ([new-board (place-piece board move player)])
               (if new-board
-                  (play new-board (next-turn player))
+                  (begin ;(printf "other pieces in group:\n~a\n"
+                                 ;(get-connected new-board
+                                                ;move))
+                         (play new-board (next-turn player)))
                   (begin (printf "Invalid move, try again\n")
                          (play board player))))])))
 
@@ -80,5 +83,5 @@
     (load-game-file? file)]))
 
 ;;;;;;;;;;;;; run game ;;;;;;;;;;;;;;;;;;
-; (start-game)
+(start-game)
 
