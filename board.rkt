@@ -35,6 +35,7 @@
                (>= x 0) (>= y 0))
         (list-ref (list-ref board y) x))))
 
+
 (define (assoc dat at val)
   "takes a list, the location in the list to replace
    and a value to replace it with.  returns copy of list

@@ -62,30 +62,25 @@
   (remove-duplicates (flatten1 complex-list)))
 
 
-
 ;;; find the liberties for the current piece, and all adjacent pieces
 ;;; of the current pieces color, then recursively call get-liberties of
 ;;; those adjacent pieces, adding the liberties found therin to the list
 
-(define (get-liberties board point [found-pieces '()] [found-liberties '()])
-  "returns list of empty spaces orthoginally adjacent to
-   the group (possibly just that one point) given"
-  (if (member point found-pieces) ;; piece has already been searched. stop this iteration here
-      found-liberties
-      (let* ([adjacent (adjacent-points board point)]
-             [liberties (filter (lambda (p) (equal? (board-ref board p) 'empty)) adjacent)]
-             [pieces (get-connected board point)])
-        (squash (append
-                 found-liberties (map (lambda (p) (get-liberties board p
-                                                                 (cons point found-pieces)
-                                                                 (append liberties found-liberties)))
-                                      pieces))))))
+(define (get-liberties board point)
+  (let ([pieces (get-connected board point)])
+    (filter (lambda (p) (equal? (board-ref board p) 'empty))
+            (squash (map (lambda (p) (adjacent-points board p)) pieces)))))
 
 
-(define (get-connected board point)
+(define (get-connected board point [found-pieces '()])
+  "recursivly finds all connected stones, finding the whole group"
   (let* ([player (board-ref board point)]
-         [adjacent (adjacent-points board point)])
-    (filter (lambda (p) (equal? player (board-ref board p))) adjacent)))
+         [adjacent (adjacent-points board point)]
+         [pieces (filter (lambda (p) (equal? player (board-ref board p))) adjacent)])
+    (if (member point found-pieces)
+        found-pieces
+        (squash (map (lambda (p) (get-connected board p (cons point found-pieces))) pieces)))))
+
 
 ;; TODO: Doesnt actually work
 (define (suicide? board point player)
@@ -93,3 +88,6 @@
    is suicidal"
   ;; place piece, get length of get-liberties, unplace piece
   (eq? (length (get-liberties board point) 0)))
+
+(define (ko? board point piece)
+  #f)

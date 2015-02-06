@@ -10,9 +10,11 @@
          [letter-map  (make-hash (map make-pair (range 19)))])
     (hash-ref letter-map letter)))
 
+(define (normalize-move point)
+  `(,(letter->number (car point)) . ,(- (cdr point) 1)))
 
 (define (place-piece board point piece)
-  (let* ([actual-move `(,(letter->number (car point)) . ,(- (cdr point) 1))]
+  (let* ([actual-move (normalize-move point)]
          [cur-piece (board-ref board actual-move)])
     (if (equal? 'empty cur-piece)
         ; return new board with piece at point
@@ -59,7 +61,8 @@
       [(equal? move 'pass) (play board (next-turn player))]
       [else (let ([new-board (place-piece board move player)])
               (if new-board
-                  (begin (printf "~a: connected ~a\n" move (get-connected board move))
+                  (begin (printf "~a: connected ~a\n" move (get-connected board
+                                                                          (normalize-move move)))
                          (play new-board (next-turn player)))
                   (begin (printf "You can't place a ~a stone at ~a\n" (symbol->string player) move)
                          (play board player))))])))
