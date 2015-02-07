@@ -33,7 +33,7 @@
                                 #:after-last (string-append " " number-buf)))))
 
 (define (remove-piece board point)
-  (board-set board point 'empty))
+  (place-stone board point 'empty))
 
 (define (board-ref board point)
   (let ([x (car point)]
@@ -134,8 +134,6 @@
     (filter (lambda (p) (equal? (board-ref board p) 'empty))
             (squash (map (lambda (p) (adjacent-points board p)) pieces)))))
 
-
-
 (define (get-connected board point [found-pieces '()])
   "recursivly finds all connected stones, finding the whole group"
       (let* ([player (board-ref board point)]
@@ -153,21 +151,22 @@
     (eq? 0 (length (get-liberties new-board point)))))
 
 
-;;; ERROR here, car given '() expected pair?
+(define (captured? board point)
+  (let ([liberties (get-liberties board point)])
+    (= 0 (length liberties))))
+
+
 (define (capturable? board point piece)
   "returns false if no capturable groups
    are made from placing piece at point,
-   otherwise returns a single point on which
-   the group lies on"
+   otherwise returns a list of a point
+   for each of the capturable groups"
   (let* ([new-board (place-stone board point piece)]
          [adjacent (adjacent-points new-board point)]
-         [adj-groups (map (lambda (p) (get-liberties new-board p))
-                          adjacent)])
-    (print adjacent)
-    (if (empty? adj-groups)
+         [captured-groups (filter (lambda (x) (captured? board x)) adjacent)])
+    (if (empty? captured-groups)
         #f
-        (map car adj-groups))))
-    
+        (car captured-groups))))
 
 
 ;; might need to keep state of board around for a few iterations
@@ -205,11 +204,13 @@
   "called by board-set; applies all applicable game logic then returns a
    either the new board as a result of placing the piece and optionally
    capturing opposing pieces, or false, stating the move was invalid"
-  (if (ko? board point piece)
-      #f
-      (let ([capture-group (capturable? board point piece)])
-        (if capture-group
-            (cons (thread-through capture board capture-group) #t)
-            (if (suicide? board point piece)
-                #f
-                (cons (place-stone board point piece) #t))))))
+  (let ([new-board (place-stone board point piece)])
+    (if (ko? new-board point piece)
+        (cons board #f)
+        (let ([capture-group (capturable? new-board point piece)])
+          (if capture-group
+              (cons (capture new-board capture-group) #t)
+              ;; (cons (thread-through capture board capture-group) #t)
+              (if (suicide? new-board point piece)
+                  (cons board #f)
+                  (cons new-board #t)))))))
