@@ -45,8 +45,9 @@ go [ <option> ... ]
   - metacommands ex. pass, save, exit
   - collision detection
   - basic capturing (edges and corners are still tricky)
+  - track number of captured stones per player
+  - game termination when both players pass consecutively
 
 # TODO:
-  - ~~add group/capture logic~~
   - changing names of players, etc.
   - A.I. (at least rudimentary)

@@ -121,7 +121,6 @@
 (define captured-white-stones (make-parameter 0))
 (define captured-black-stones (make-parameter 0))
 
-
 ;;; TODO wire in parameter to keep track of number and color
 ;;; of captured stones
 (define (capture board point)
@@ -140,6 +139,7 @@
   (let ([pieces (get-connected board point)])
     (filter (lambda (p) (equal? (board-ref board p) 'empty))
             (squash (map (lambda (p) (adjacent-points board p)) pieces)))))
+
 
 (define (get-connected board point [found-pieces '()])
   "recursivly finds all connected stones, finding the whole group"
@@ -180,10 +180,10 @@
         captured-groups)))
 
 
-;; might need to keep state of board around for a few iterations
-;; otherwise cant access previous board state
-(define (ko? board point piece)
-  #f)
+(define previous-board-states (make-parameter '()))
+
+(define (ko? board)
+  (member board (previous-board-states)))
 
 
 (define (apply-logic board point piece)
@@ -191,11 +191,10 @@
    either the new board as a result of placing the piece and optionally
    capturing opposing pieces, or false, stating the move was invalid"
   (let ([new-board (place-stone board point piece)])
-    (if (ko? new-board point piece)
+    (if (ko? new-board)
         (cons board #f)
         (let ([capture-group (capturable? new-board point piece)])
           (if capture-group
-              ; (cons (capture new-board capture-group) #t)
               (cons (thread-through new-board capture capture-group) #t)
               (if (suicide? new-board point piece)
                   (cons board #f)

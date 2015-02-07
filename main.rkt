@@ -49,6 +49,9 @@
     [(equal? player 'white) 'black]))
 
 
+(define (score-game board)
+  (printf "Both players passed. Game is done.\n"))
+
 (define (play board player)
   (newline)
   (print-board board)
@@ -57,10 +60,14 @@
     (cond
       [(equal? move 'save) (save-game board player)]
       [(equal? move 'exit) (printf "Bye!\n")]
-      [(equal? move 'pass) (play board (next-turn player))]
+      [(equal? move 'pass) (begin (num-passes (+ 1 (num-passes)))
+                                  (if (>= (num-passes) 2)
+                                      (score-game board)
+                                      (play board (next-turn player))))]
       [else (let ([new-board (place-piece board move player)])
               (if new-board
-                  (play new-board (next-turn player))
+                  (begin (num-passes 0)
+                         (play new-board (next-turn player)))
                   (begin (printf "You can't place a ~a stone at ~a\n" (symbol->string player) move)
                          (play board player))))])))
 
@@ -71,6 +78,8 @@
       (play initial-board 'black)))
 
 (define load-game-file? (make-parameter #f))
+
+(define num-passes (make-parameter 0))
 
 
 (define game-to-load
