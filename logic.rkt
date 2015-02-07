@@ -70,24 +70,26 @@
 (define (get-liberties board point [found-pieces '()] [found-liberties '()])
   "returns list of empty spaces orthoginally adjacent to
    the group (possibly just that one point) given"
-  (if (member point found-pieces) ;; piece has already been searched. stop here
+  (if (member point found-pieces) ;; piece has already been searched. stop this iteration here
       found-liberties
-      (let* ([player (board-ref board point)]
-             [adjacent (adjacent-points board point)]
+      (let* ([adjacent (adjacent-points board point)]
              [liberties (filter (lambda (p) (equal? (board-ref board p) 'empty)) adjacent)]
-             [pieces (filter (lambda (p) (equal? player (board-ref board p))) adjacent)])
+             [pieces (get-connected board point)])
         (squash (append
-                 found-liberties (map (lambda (p)
-                                        (get-liberties board p
-                                                       (cons point found-pieces)
-                                                       (append liberties found-liberties)))
+                 found-liberties (map (lambda (p) (get-liberties board p
+                                                                 (cons point found-pieces)
+                                                                 (append liberties found-liberties)))
                                       pieces))))))
 
 
 (define (get-connected board point)
-  '())
+  (let* ([player (board-ref board point)]
+         [adjacent (adjacent-points board point)])
+    (filter (lambda (p) (equal? player (board-ref board p))) adjacent)))
 
-(define (suicide? board move player)
+;; TODO: Doesnt actually work
+(define (suicide? board point player)
   "returns true if placing your stone at the specified point
    is suicidal"
-  #f)
+  ;; place piece, get length of get-liberties, unplace piece
+  (eq? (length (get-liberties board point) 0)))
