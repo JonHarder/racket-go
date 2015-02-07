@@ -36,8 +36,9 @@
          (>= x 0) (>= y 0))))
 
 
-;;; this works correctly now (probably)
 (define (adjacent-points board point)
+  "finds all orthoginally adjacent points on the
+   given board to the given piece, ignoring borders"
   (let* ([player (board-ref board point)]
          [x (car point)]
          [y (cdr point)]
@@ -45,34 +46,43 @@
          [left `(,(- x 1) . ,y)]
          [right `(,(+ 1 x) . ,y)]
          [below `(,x . ,(- y 1))])
-    (filter (λ (p) (on-board board p)) (list above left right below))))
+    (filter (lambda (p) (on-board board p)) (list above left right below))))
+
+(define (flatten1 list)
+             (let loop ([l list] [acc null])
+               (cond [(null? l) acc]
+                     [(list? l) (loop (car l) (loop (cdr l) acc))]
+                     [else (cons l acc)])))
 
 
-;;; this still hangs
+
+(define (squash complex-list)
+  "takes a arbitrarily nested list of pairs and flattens them
+   down to a flat list, removing duplicates"
+  (remove-duplicates (flatten1 complex-list)))
+
+
+
+;;; find the liberties for the current piece, and all adjacent pieces
+;;; of the current pieces color, then recursively call get-liberties of
+;;; those adjacent pieces, adding the liberties found therin to the list
+
 (define (get-liberties board point [found-pieces '()] [found-liberties '()])
   "returns list of empty spaces orthoginally adjacent to
    the group (possibly just that one point) given"
-  (if (or (member point found-pieces)
-          (equal? (board-ref board point) 'empty))
+  (if (member point found-pieces) ;; piece has already been searched. stop here
       found-liberties
       (let* ([player (board-ref board point)]
              [adjacent (adjacent-points board point)]
-             [liberties (filter (λ (p) (equal? (board-ref board p) 'empty))
-                               adjacent)]
-             [pieces (filter (λ (p) (equal? player (board-ref board p))) adjacent)])
-        (append found-liberties (get-liberties board point pieces liberties)))))
+             [liberties (filter (lambda (p) (equal? (board-ref board p) 'empty)) adjacent)]
+             [pieces (filter (lambda (p) (equal? player (board-ref board p))) adjacent)])
+        (squash (append
+                 found-liberties (map (lambda (p)
+                                        (get-liberties board p
+                                                       (cons point found-pieces)
+                                                       (append liberties found-liberties)))
+                                      pieces))))))
 
-
-
-;; get liberties
-;;; for current piece:
-;;;   if piece in found pieces
-;;;      stop
-;;;      return list of liberties
-;;;   else
-;;;      add piece to list of found pieces
-;;;      add add liberties to list of liberties
-;;;      get liberties of adjacent pieces
 
 (define (get-connected board point)
   '())
