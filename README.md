@@ -44,8 +44,9 @@ go [ <option> ... ]
   - saving/loading
   - metacommands ex. pass, save, exit
   - collision detection
+  - basic capturing (edges and corners are still tricky)
 
 # TODO:
-  - add group/capture logic
-    game, changing names of players, etc.
+  - ~~add group/capture logic~~
+  - changing names of players, etc.
   - A.I. (at least rudimentary)

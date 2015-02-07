@@ -61,7 +61,7 @@
     ;; unchanged
     (if (cdr result)
         (car result)
-        board)))
+        #f)))
 
 
 ;; this works
