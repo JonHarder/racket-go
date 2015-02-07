@@ -2,10 +2,6 @@
 
 ;; board.rkt
 
-;; need to be consistent with possible placing of pieces. some functions
-;; rely on possible piece already being there, some put it there for you
-;; and then check.  Need to decide which one to stick with.
-
 (provide (all-defined-out))
 
 (define initial-board (make-list 19 (make-list 19 'empty)))
@@ -21,8 +17,6 @@
 
 (define (print-row n row)
   (let ([row-str-list (if (member n '(3 9 15))
-                          ;; map over display-piece, but pass extra reference-point
-                          ;; when applicable
                           (map (lambda (num) (display-piece (list-ref row num) num)) (range 19))
                           (map display-piece row))]
         [number-buf (if (< n 9)
@@ -34,6 +28,7 @@
 
 (define (remove-piece board point)
   (place-stone board point 'empty))
+
 
 (define (board-ref board point)
   (let ([x (car point)]
@@ -53,7 +48,6 @@
 (define (board-set board point piece)
   (let* ([x (car point)]
          [y (cdr point)]
-         ; [new-board (place-stone board point piece)]
          [result (apply-logic board point piece)])
     ;; if you can successfully place the piece, return the new board
     ;; as a result of doing so, if placing the piece was unsuccessful
@@ -64,7 +58,6 @@
         #f)))
 
 
-;; this works
 (define (place-stone board point piece)
   (let* ([x (car point)]
          [y (cdr point)])
@@ -122,6 +115,8 @@
       (thread-through (fun val (car args)) fun (cdr args))))
 
 
+;;; TODO wire in parameter to keep track of number and color
+;;; of captured stones
 (define (capture board point)
   "removes the piece and all connected pieces (if any)
    from the board, returning the new board without those pieces"
@@ -136,12 +131,14 @@
 
 (define (get-connected board point [found-pieces '()])
   "recursivly finds all connected stones, finding the whole group"
+  (if (equal? 'empty (board-ref board point))
+      '()
       (let* ([player (board-ref board point)]
              [adjacent (adjacent-points board point)]
              [pieces (filter (lambda (p) (equal? player (board-ref board p))) adjacent)])
         (if (member point found-pieces)
             found-pieces
-            (squash (cons point (map (lambda (p) (get-connected board p (cons point found-pieces))) pieces))))))
+            (squash (cons point (map (lambda (p) (get-connected board p (cons point found-pieces))) pieces)))))))
 
 
 (define (suicide? board point player)
@@ -152,21 +149,23 @@
 
 
 (define (captured? board point)
-  (let ([liberties (get-liberties board point)])
-    (= 0 (length liberties))))
+  (if (equal? (board-ref board point) 'empty)
+      #f
+      (let ([liberties (get-liberties board point)])
+        (= 0 (length liberties)))))
 
 
 (define (capturable? board point piece)
   "returns false if no capturable groups
    are made from placing piece at point,
-   otherwise returns a list of a point
-   for each of the capturable groups"
+   otherwise returns a list of a single point
+   for each of the groups captured"
   (let* ([new-board (place-stone board point piece)]
          [adjacent (adjacent-points new-board point)]
-         [captured-groups (filter (lambda (x) (captured? board x)) adjacent)])
+         [captured-groups (filter (lambda (x) (captured? new-board x)) adjacent)])
     (if (empty? captured-groups)
         #f
-        (car captured-groups))))
+        captured-groups)))
 
 
 ;; might need to keep state of board around for a few iterations
@@ -175,31 +174,6 @@
   #f)
 
 
-;;; RULES (to follow in order, ignoring rules if they dont apply,
-;;; disregarding any subsequent rules after the first applied rule
-;;;
-;;;
-;;; 1. A single stone in do, can't be captured.
-;;;
-;;; 2. if a group is in atari, it can be captured
-;;;
-;;; 3. you can't place a stone where the group it will become part of
-;;;    results in a zero liberties group
-;;;
-;;; DEFINITIONS:
-;;; Liberty: an empty orthoginal space adjacent to a group
-;;; Ko: repetitive capture
-;;; Atari: threat to capture at next move
-;;;
-;;; if ko then
-;;;     invalid
-;;;     stop
-;;; else if capture
-;;;     then valid
-;;;     stop
-;;; else if suicide
-;;;     then invalid
-;;; else valid
 (define (apply-logic board point piece)
   "called by board-set; applies all applicable game logic then returns a
    either the new board as a result of placing the piece and optionally
@@ -209,8 +183,8 @@
         (cons board #f)
         (let ([capture-group (capturable? new-board point piece)])
           (if capture-group
-              (cons (capture new-board capture-group) #t)
-              ;; (cons (thread-through capture board capture-group) #t)
+              ; (cons (capture new-board capture-group) #t)
+              (cons (thread-through new-board capture capture-group) #t)
               (if (suicide? new-board point piece)
                   (cons board #f)
                   (cons new-board #t)))))))

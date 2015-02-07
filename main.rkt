@@ -13,7 +13,6 @@
   `(,(letter->number (car point)) . ,(- (cdr point) 1)))
 
 
-;; infuse logic of capture, ko, suicide etc. here
 (define (place-piece board point piece)
   (let* ([actual-move (normalize-move point)]
          [cur-piece (board-ref board actual-move)])
@@ -82,4 +81,4 @@
     (load-game-file? file)]))
 
 ;;;;;;;;;;;;; run game ;;;;;;;;;;;;;;;;;;
-; (start-game)
+(start-game)
