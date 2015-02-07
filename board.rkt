@@ -65,6 +65,9 @@
 
 
 (define (print-board board)
+  (printf "Captured white stones: ~a\n" (captured-white-stones))
+  (printf "Captured black stones: ~a\n" (captured-black-stones))
+  (newline)
   (printf "   A B C D E F G H I J K L M N O P Q R S\n")
   (for-each (lambda (n) (print-row n (list-ref board n)))
             (range 18 -1 -1))
@@ -115,12 +118,21 @@
       (thread-through (fun val (car args)) fun (cdr args))))
 
 
+(define captured-white-stones (make-parameter 0))
+(define captured-black-stones (make-parameter 0))
+
+
 ;;; TODO wire in parameter to keep track of number and color
 ;;; of captured stones
 (define (capture board point)
   "removes the piece and all connected pieces (if any)
    from the board, returning the new board without those pieces"
-  (let ([pieces (get-connected board point)])
+  (let* ([pieces (get-connected board point)]
+        [num-pieces (length pieces)]
+        [player (board-ref board point)])
+    (cond
+     [(equal? player 'white) (captured-white-stones (+ num-pieces (captured-white-stones)))]
+     [(equal? player 'black) (captured-black-stones (+ num-pieces (captured-black-stones)))])
     (thread-through board remove-piece pieces)))
 
 
