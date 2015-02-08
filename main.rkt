@@ -82,4 +82,4 @@
     (load-game-file? file)]))
 
 ;;;;;;;;;;;;; run game ;;;;;;;;;;;;;;;;;;
-(start-game)
+; (start-game)

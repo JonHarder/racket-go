@@ -53,8 +53,8 @@
 (define (board-set board point piece)
   (let* ([x (car point)]
          [y (cdr point)]
-         [new-board (place-stone board point piece)]
-         [result (apply-logic new-board point piece)])
+         ; [new-board (place-stone board point piece)]
+         [result (apply-logic board point piece)])
     ;; if you can successfully place the piece, return the new board
     ;; as a result of doing so, if placing the piece was unsuccessful
     ;; due to ko or suicide etc. dont place the piece and return the board
@@ -64,6 +64,7 @@
         board)))
 
 
+;; this works
 (define (place-stone board point piece)
   (let* ([x (car point)]
          [y (cdr point)])
@@ -88,14 +89,16 @@
 (define (adjacent-points board point)
   "finds all orthoginally adjacent points on the
    given board to the given piece, ignoring borders"
-  (let* ([player (board-ref board point)]
-         [x (car point)]
-         [y (cdr point)]
-         [above `(,x . ,(+ 1 y))]
-         [left `(,(- x 1) . ,y)]
-         [right `(,(+ 1 x) . ,y)]
-         [below `(,x . ,(- y 1))])
-    (filter (lambda (p) (on-board board p)) (list above left right below))))
+  (if (equal? (board-ref board point) 'empty)
+      '()
+      (let* ([player (board-ref board point)]
+             [x (car point)]
+             [y (cdr point)]
+             [above `(,x . ,(+ 1 y))]
+             [left `(,(- x 1) . ,y)]
+             [right `(,(+ 1 x) . ,y)]
+             [below `(,x . ,(- y 1))])
+        (filter (lambda (p) (on-board board p)) (list above left right below)))))
 
 
 (define (flatten1 list)
@@ -126,9 +129,6 @@
     (thread-through board remove-piece pieces)))
 
 
-;;; find the liberties for the current piece, and all adjacent pieces
-;;; of the current pieces color, then recursively call get-liberties of
-;;; those adjacent pieces, adding the liberties found therin to the list
 (define (get-liberties board point)
   (let ([pieces (get-connected board point)])
     (filter (lambda (p) (equal? (board-ref board p) 'empty))
@@ -149,16 +149,25 @@
 (define (suicide? board point player)
   "returns true if placing your stone at the specified point
    is suicidal"
-  (let ([new-board (board-set board point player)])
+  (let ([new-board (place-stone board point player)])
     (eq? 0 (length (get-liberties new-board point)))))
 
 
+;;; ERROR here, car given '() expected pair?
 (define (capturable? board point piece)
   "returns false if no capturable groups
    are made from placing piece at point,
    otherwise returns a single point on which
    the group lies on"
-  #f)
+  (let* ([new-board (place-stone board point piece)]
+         [adjacent (adjacent-points new-board point)]
+         [adj-groups (map (lambda (p) (get-liberties new-board p))
+                          adjacent)])
+    (print adjacent)
+    (if (empty? adj-groups)
+        #f
+        (map car adj-groups))))
+    
 
 
 ;; might need to keep state of board around for a few iterations
@@ -200,7 +209,7 @@
       #f
       (let ([capture-group (capturable? board point piece)])
         (if capture-group
-            (cons (capture board capture-group) #t)
+            (cons (thread-through capture board capture-group) #t)
             (if (suicide? board point piece)
                 #f
                 (cons (place-stone board point piece) #t))))))
