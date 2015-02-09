@@ -1,6 +1,10 @@
 #lang racket
 
-(define (decide-move board)
-  "given the current state of the board, determine where to place its
-   next move. For now computer is assumed to be the white stones"
-  '(0 . 0))
+(require "board.rkt")
+
+(provide (all-defined-out))
+
+(define (get-computer-move board player)
+  (let* ([letters "ABCDEFGHIJKLMNOPQRS"]
+         [x (string (list-ref (string->list letters) (random 19)))])
+  '("B" . 2)))

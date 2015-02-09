@@ -2,6 +2,7 @@
 
 (require "move.rkt")
 (require "board.rkt")
+(require "computer.rkt")
 
 (define (letter->number letter)
   (let* ([letter-list (map string (string->list "ABCDEFGHIJKLMNOPQRS"))]
@@ -35,7 +36,9 @@
   (newline)
   (print-board board)
   (newline)
-  (let ([move (get-move player)])
+  (let ([move (if (and (computer-on?) (equal? player 'white))
+                  (get-computer-move board player)
+                  (get-move player))])
     (cond
       [(equal? move 'save) (save-game board player)]
       [(equal? move 'exit) (printf "Bye!\n")]
@@ -69,15 +72,28 @@
 (define load-game-file? (make-parameter #f))
 
 (define num-passes (make-parameter 0))
+(define computer-on? (make-parameter #f))
+(define run-as-server (make-parameter #f))
+(define connect-to (make-parameter #f))
 
 
 (define game-to-load
   (command-line
-  #:once-each
-   [("-l" "--load")
-    file
-    "Load save file to continue previous game"
-    (load-game-file? file)]))
+  #:once-any
+  [("-l" "--load")
+   file
+   "Load save file to continue previous game"
+   (load-game-file? file)]
+  [("-c" "--computer")
+   "[EXPERIMENTAL] Play against a computer opponent"
+   (computer-on? #t)]
+  [("-s" "--server")
+   "[NOT IMPLEMENTED] Run as a server for someone to connect to"
+   (run-as-server #t)]
+  [("-r" "--remote")
+   ip
+   "[NOT IMPLEMENTED] Connect to ip of computer running racket-go as a server"
+   (connect-to ip)]))
 
 ;;;;;;;;;;;;; run game ;;;;;;;;;;;;;;;;;;
 (start-game)
