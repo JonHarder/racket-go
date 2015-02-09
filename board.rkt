@@ -188,20 +188,21 @@
 
 
 (define (apply-logic board point piece)
-  (let ([new-board (simulate board point piece)])
-    (if (ko? new-board)
-        (cons board #f)
-        (cons new-board #t))))
-
-
-(define (simulate board point piece)
   "called by board-set; applies all applicable game logic then returns a
    either the new board as a result of placing the piece and optionally
    capturing opposing pieces, or false, stating the move was invalid"
+  (let ([new-board (simulate board point piece)])
+    (if (ko? (car new-board))
+        (cons board #f)
+        (begin (previous-board-states (cons new-board (previous-board-states)))
+               new-board))))
+
+
+(define (simulate board point piece)
   (let* ([new-board (place-stone board point piece)]
-         [capture-group (capturable? new-board point piece)])
-    (if capture-group
-        (cons (thread-through new-board capture capture-group) #t)
+         [capture-groups (capturable? new-board point piece)])
+    (if capture-groups
+        (cons (thread-through new-board capture capture-groups) #t)
         (if (suicide? new-board point piece)
             (cons board #f)
             (cons new-board #t)))))
