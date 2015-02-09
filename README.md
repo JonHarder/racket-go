@@ -44,10 +44,14 @@ go [ <option> ... ]
   - saving/loading
   - metacommands ex. pass, save, exit
   - collision detection
-  - basic capturing (edges and corners are still tricky)
+  - ko detection
+  - suicide detection
+  - basic capturing ~~(edges and corners are still tricky)~~
   - track number of captured stones per player
   - game termination when both players pass consecutively
 
 # TODO:
   - changing names of players, etc.
   - A.I. (at least rudimentary)
+  - Graphical interface
+  - game timer
