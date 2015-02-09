@@ -53,10 +53,13 @@
     ;; as a result of doing so, if placing the piece was unsuccessful
     ;; due to ko or suicide etc. dont place the piece and return the board
     ;; unchanged
-    (if (cdr result)
-        (begin (previous-board-states (cons (car result) (previous-board-states)))
-               (car result))
-        #f)))
+    (cond
+      [(member result '(ko suicide)) result]
+      [else
+       (if (cdr result)
+           (begin (previous-board-states (cons (car result) (previous-board-states)))
+                  (car result))
+           #f)])))
 
 
 (define (place-stone board point piece)
@@ -192,10 +195,12 @@
    either the new board as a result of placing the piece and optionally
    capturing opposing pieces, or false, stating the move was invalid"
   (let ([new-board (simulate board point piece)])
-    (if (ko? (car new-board))
-        (cons board #f)
-        (begin (previous-board-states (cons new-board (previous-board-states)))
-               new-board))))
+    (if (equal? new-board 'suicide)
+      'suicide
+      (if (ko? (car new-board))
+          'ko
+          (begin (previous-board-states (cons new-board (previous-board-states)))
+                 new-board)))))
 
 
 (define (simulate board point piece)
@@ -204,7 +209,7 @@
     (if capture-groups
         (cons (thread-through new-board capture capture-groups) #t)
         (if (suicide? new-board point piece)
-            (cons board #f)
+            'suicide
             (cons new-board #t)))))
 
 

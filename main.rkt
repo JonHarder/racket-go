@@ -44,11 +44,17 @@
                                       (score-game board)
                                       (play board (next-turn player))))]
       [else (let ([new-board (place-piece board move player)])
-              (if new-board
-                  (begin (num-passes 0)
-                         (play new-board (next-turn player)))
-                  (begin (printf "You can't place a ~a stone at ~a\n" (symbol->string player) move)
-                         (play board player))))])))
+              (cond
+                [(equal? new-board 'ko) (begin (printf "That move is illegal due to ko rule.\n")
+                                               (play board player))]
+                [(equal? new-board 'suicide) (begin (printf "That move is suicidal\n")
+                                                    (play board player))]
+                [else
+                 (if new-board
+                     (begin (num-passes 0)
+                            (play new-board (next-turn player)))
+                     (begin (printf "You can't place a ~a stone at ~a\n" (symbol->string player) move)
+                            (play board player)))]))])))
 
 (define (start-game)
   (if (load-game-file?)
