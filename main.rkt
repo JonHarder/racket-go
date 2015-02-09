@@ -45,9 +45,9 @@
                                       (play board (next-turn player))))]
       [else (let ([new-board (place-piece board move player)])
               (cond
-                [(equal? new-board 'ko) (begin (printf "That move is illegal due to ko rule.\n")
+                [(equal? new-board 'ko) (begin (printf "Playing at ~a is illegal due to ko rule.\n" move)
                                                (play board player))]
-                [(equal? new-board 'suicide) (begin (printf "That move is suicidal\n")
+                [(equal? new-board 'suicide) (begin (printf "Playing at ~a is suicidal\n" move)
                                                     (play board player))]
                 [else
                  (if new-board
