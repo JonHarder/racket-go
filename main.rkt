@@ -21,28 +21,6 @@
         #f)))
 
 
-(define (save-game board player [location #f])
-  (printf "Saving game...\n")
-  (if location
-      (display-to-file (list player board) location #:exists 'replace)
-      (let* ([home (find-system-path 'home-dir)]
-             [path (build-path home "go.save")])
-        (display-to-file (list player board) path #:exists 'replace)))
-  (printf "Done saving game.\n"))
-
-
-(define (load-game [path #f])
-  "takes (optional) file path and returns (list player board)"
-  (if (not path)
-      (let* ([home (find-system-path 'home-dir)]
-             [filepath (build-path home "go.save")])
-        (printf "Loading save from \"~a\"\n" filepath)
-        (file->value filepath))
-      (begin
-        (printf "Loading save from \"~a\"\n" path)
-        (file->value path))))
-
-
 (define (next-turn player)
   (cond
     [(equal? player 'black) 'white]
@@ -51,6 +29,7 @@
 
 (define (score-game board)
   (printf "Both players passed. Game is done.\n"))
+
 
 (define (play board player)
   (newline)
@@ -74,8 +53,12 @@
 (define (start-game)
   (if (load-game-file?)
       (let ([contents (load-game (load-game-file?))])
-        (play (cadr contents) (car contents)))
+        (captured-black-stones (cdr (car contents)))
+        (captured-white-stones (car (car contents)))
+        (play (third contents)
+              (second contents)))
       (play initial-board 'black)))
+
 
 (define load-game-file? (make-parameter #f))
 

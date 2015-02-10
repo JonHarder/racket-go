@@ -54,7 +54,8 @@
     ;; due to ko or suicide etc. dont place the piece and return the board
     ;; unchanged
     (if (cdr result)
-        (car result)
+        (begin (previous-board-states (cons (car result) (previous-board-states)))
+               (car result))
         #f)))
 
 
@@ -187,15 +188,45 @@
 
 
 (define (apply-logic board point piece)
+  (let ([new-board (simulate board point piece)])
+    (if (ko? new-board)
+        (cons board #f)
+        (cons new-board #t))))
+
+
+(define (simulate board point piece)
   "called by board-set; applies all applicable game logic then returns a
    either the new board as a result of placing the piece and optionally
    capturing opposing pieces, or false, stating the move was invalid"
-  (let ([new-board (place-stone board point piece)])
-    (if (ko? new-board)
-        (cons board #f)
-        (let ([capture-group (capturable? new-board point piece)])
-          (if capture-group
-              (cons (thread-through new-board capture capture-group) #t)
-              (if (suicide? new-board point piece)
-                  (cons board #f)
-                  (cons new-board #t)))))))
+  (let* ([new-board (place-stone board point piece)]
+         [capture-group (capturable? new-board point piece)])
+    (if capture-group
+        (cons (thread-through new-board capture capture-group) #t)
+        (if (suicide? new-board point piece)
+            (cons board #f)
+            (cons new-board #t)))))
+
+
+(define (save-game board player [location #f])
+  (printf "Saving game...\n")
+  (let ([black (captured-white-stones)]
+        [white (captured-black-stones)])
+    (if location
+        (display-to-file (list `(,black . ,white) player board) location #:exists 'replace)
+        (let* ([home (find-system-path 'home-dir)]
+               [path (build-path home "go.save")])
+          (display-to-file (list `(,black . ,white) player board) path #:exists 'replace)))
+    (printf "Done saving game.\n")))
+
+
+(define (load-game [path #f])
+  "takes (optional) file path and returns (list player board)"
+  (if (not path)
+      (let* ([home (find-system-path 'home-dir)]
+             [filepath (build-path home "go.save")])
+        (printf "Loading save from \"~a\"\n" filepath)
+        (let ([loaded-data (file->value filepath)])
+          loaded-data))
+      (let ([loaded-data (file->value path)])
+        (printf "Loading save from \"~a\"\n" path)
+        loaded-data)))
