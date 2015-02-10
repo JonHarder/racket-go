@@ -3,6 +3,8 @@
 (require "move.rkt")
 (require "board.rkt")
 (require "computer.rkt")
+(require "server.rkt")
+(require "client.rkt")
 
 (define (letter->number letter)
   (let* ([letter-list (map string (string->list "ABCDEFGHIJKLMNOPQRS"))]
@@ -50,8 +52,7 @@
               (cond
                 [(equal? new-board 'ko) (begin (printf "Playing at ~a is illegal due to ko rule.\n" move)
                                                (play board player))]
-                [(equal? new-board 'suicide) (begin (printf "Playing at ~a is suicidal\n" move)
-                                                    (play board player))]
+                [(equal? new-board 'suicide) (begin (printf "Playing at ~a is suicidal\n" move) (play board player))]
                 [else
                  (if new-board
                      (begin (num-passes 0)
@@ -72,9 +73,13 @@
 (define load-game-file? (make-parameter #f))
 
 (define num-passes (make-parameter 0))
+
 (define computer-on? (make-parameter #f))
+
+(define server-conn (make-parameter #f))
+(define client-conn (make-parameter #f))
 (define run-as-server (make-parameter #f))
-(define connect-to (make-parameter #f))
+(define run-as-client (make-parameter #f))
 
 
 (define game-to-load
@@ -82,10 +87,10 @@
   #:once-each
   [("-l" "--load")
    file
-   "Load save file to continue previous game"
+   "Load save file to continue previous game, default save location is ~/go.save"
    (load-game-file? file)]
   [("-c" "--computer")
-   "[EXPERIMENTAL] Play against a computer opponent"
+   "Play against a computer opponent (Just picks randomly for now)"
    (computer-on? #t)]
   #:once-any
   [("-s" "--server")
@@ -94,7 +99,13 @@
   [("-r" "--remote")
    ip
    "[NOT IMPLEMENTED] Connect to ip of computer running racket-go as a server"
-   (connect-to ip)]))
+   (run-as-client ip)]))
 
 ;;;;;;;;;;;;; run game ;;;;;;;;;;;;;;;;;;
+(when (run-as-server)
+  (server-conn (make-server-connection)))
+
+(when (run-as-client)
+  (client-conn (make-client-connection)))
+
 (start-game)

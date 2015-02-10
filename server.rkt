@@ -4,19 +4,9 @@
 
 (provide (all-defined-out))
 
-(define server-listener (tcp-listen 8886))
-(define-values (in out) (tcp-accept server-listener))
+(struct connection (listener in out))
 
-(define (server-loop)
-  (displayln "Waiting for move from black")
-  (flush-output)
-  (let ([move (read in)])
-    (printf "Blacks move: ~a\n" move))
-  (let ([move (get-move 'white)])
-    (write move out)
-    (flush-output out))
-  (server-loop))
-
-(server-loop)
-
-(tcp-close server-listener)
+(define (make-server-connection [port 8886])
+  (let ([listener (tcp-listen port)])
+    (let-values ([(in out) (tcp-accept listener)])
+      (connection listener in out))))
