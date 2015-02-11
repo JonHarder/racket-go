@@ -39,19 +39,23 @@ go [ <option> ... ]
 ```
 
 # What works:
-  - robust move parsing
-  - alternating turns
-  - saving/loading
-  - metacommands ex. pass, save, exit
-  - collision detection
-  - ko detection
-  - suicide detection
-  - basic capturing ~~(edges and corners are still tricky)~~
-  - track number of captured stones per player
-  - game termination when both players pass consecutively
+  - Complete Player vs. Player play including
+    - robust move parsing
+    - alternating turns
+    - saving/loading
+    - metacommands ex. pass, save, exit
+    - collision detection
+    - super-ko detection
+    - suicide detection
+    - capturing
+    - track number of captured stones per player
+    - game termination when both players pass consecutively
 
 # TODO:
   - changing names of players, etc.
   - A.I. (at least rudimentary)
   - Graphical interface
   - game timer
+  - keep game tree to move forward/backward/laterally in game state
+  - load and save smart game format files
+  - add parenthesis around last played stone (X)
