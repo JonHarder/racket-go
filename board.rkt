@@ -26,6 +26,49 @@
                                 #:before-first number-buf
                                 #:after-last (string-append " " number-buf)))))
 
+
+(define (print-board board)
+  (printf "Captured white stones: ~a\n" (captured-white-stones))
+  (printf "Captured black stones: ~a\n" (captured-black-stones))
+  (newline)
+  (printf "   A B C D E F G H I J K L M N O P Q R S\n")
+  (for-each (lambda (n) (print-row n (list-ref board n)))
+            (range 18 -1 -1))
+  (printf "   A B C D E F G H I J K L M N O P Q R S\n"))
+
+(define (zip l1 l2)
+  (cond
+    [(null? l1) l2]
+    [(null? l2) l1]
+    [else
+     (cons `(,(car l1) . ,(car l2)) (zip (cdr l1) (cdr l2)))]))
+
+(define (new-display-piece piece-point-pair)
+  (let* ([piece (car piece-point-pair)]
+         [point (cdr piece-point-pair)]
+         [x (car point)]
+         [y (cdr point)]
+         [piece-hash (make-hash '((white . "O") (black . "X") (empty . ".")))]
+         [repr (if (and (member x '(3 9 15))
+                        (member y '(3 9 15))
+                        (equal? piece 'empty))
+                   "+"
+                   (hash-ref piece-hash piece))])
+    (if (member point (last-played-stone))
+        (string-join
+
+(define (new-print-board board)
+  (let* ([points (for*/list ([i (range 19)] [j (range 19)])
+                   (cons i j))]
+         [board-point-pairs (zip (flatten board) points)])
+    (printf "Captured white stones: ~a\n" (captured-white-stones))
+    (printf "Captured black stones: ~a\n" (captured-black-stones))
+    (newline)
+    (printf "   A B C D E F G H I J K L M N O P Q R S\n")
+    board-point-pairs
+    (printf "   A B C D E F G H I J K L M N O P Q R S\n")))
+
+
 (define (remove-piece board point)
   (place-stone board point 'empty))
 
@@ -66,16 +109,6 @@
   (let* ([x (car point)]
          [y (cdr point)])
     (assoc board y (assoc (list-ref board y) x piece))))
-
-
-(define (print-board board)
-  (printf "Captured white stones: ~a\n" (captured-white-stones))
-  (printf "Captured black stones: ~a\n" (captured-black-stones))
-  (newline)
-  (printf "   A B C D E F G H I J K L M N O P Q R S\n")
-  (for-each (lambda (n) (print-row n (list-ref board n)))
-            (range 18 -1 -1))
-  (printf "   A B C D E F G H I J K L M N O P Q R S\n"))
 
 
 
