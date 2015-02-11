@@ -79,7 +79,7 @@
 
 (define game-to-load
   (command-line
-  #:once-any
+  #:once-each
   [("-l" "--load")
    file
    "Load save file to continue previous game"
@@ -87,6 +87,7 @@
   [("-c" "--computer")
    "[EXPERIMENTAL] Play against a computer opponent"
    (computer-on? #t)]
+  #:once-any
   [("-s" "--server")
    "[NOT IMPLEMENTED] Run as a server for someone to connect to"
    (run-as-server #t)]
