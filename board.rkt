@@ -6,6 +6,8 @@
 
 (define initial-board (make-list 19 (make-list 19 'empty)))
 
+(define last-played-stone (make-parameter '()))
+
 
 (define (display-piece piece [index #f])
   (let ([repr (hash-ref (make-hash '((white . "O") (black . "X") (empty . "."))) piece)])
@@ -55,7 +57,13 @@
                    "+"
                    (hash-ref piece-hash piece))])
     (if (member point (last-played-stone))
-        (string-join
+        (string-join (list repr) #:before-first "(" #:after-last ")")
+        repr)))
+
+
+(define (new-print-row row)
+  #f)
+
 
 (define (new-print-board board)
   (let* ([points (for*/list ([i (range 19)] [j (range 19)])
@@ -65,7 +73,9 @@
     (printf "Captured black stones: ~a\n" (captured-black-stones))
     (newline)
     (printf "   A B C D E F G H I J K L M N O P Q R S\n")
-    board-point-pairs
+    ;; cut board-point-pairs into chunks of 19, map that list
+    ;; over to new-print-row
+    ;; (printf (map new-print-row board-point-pairs))
     (printf "   A B C D E F G H I J K L M N O P Q R S\n")))
 
 
@@ -100,7 +110,8 @@
       [(member result '(ko suicide)) result]
       [else
        (if (cdr result)
-           (begin (previous-board-states (cons (car result) (previous-board-states)))
+           (begin (last-played-stone point)
+                  (previous-board-states (cons (car result) (previous-board-states)))
                   (car result))
            #f)])))
 
