@@ -45,9 +45,12 @@
     [else
      (cons `(,(car l1) . ,(car l2)) (zip (cdr l1) (cdr l2)))]))
 
-(define (new-display-piece piece-point-pair)
+(define (new-display-piece piece-point-pair [is-left-of #f])
+  "first check if last played is on this row, if not ignore, if yes,
+   find left and right stone"
   (let* ([piece (car piece-point-pair)]
          [point (cdr piece-point-pair)]
+         [last-played (last-played-stone)]
          [x (car point)]
          [y (cdr point)]
          [piece-hash (make-hash '((white . "O") (black . "X") (empty . ".")))]
@@ -56,26 +59,47 @@
                         (equal? piece 'empty))
                    "+"
                    (hash-ref piece-hash piece))])
-    (if (member point (last-played-stone))
-        (string-join (list repr) #:before-first "(" #:after-last ")")
-        repr)))
+    ;; never hit as far as I can tell
+    (when is-left-of
+        (printf "~a is left of last played: ~a\n" (cdr piece-point-pair) is-left-of))
+    (cond
+      [(equal? point last-played) (string-join (list repr) #:before-first "("
+                                               #:after-last ")")]
+      [is-left-of repr]
+      [else (string-append repr " ")])))
 
 
 (define (new-print-row row)
-  #f)
+  "find left of last played, right of last played, only buffer whitespace"
+  ;; piece-point = (piece x . y)
+  ;; thus (car piece-point) = piece
+  ;; and (cdr piece-point) = (x . y)
+  (let* ([row-num (car (cdr (car row)))]
+         [left-of (if (null? (last-played-stone)) '() `(,(- (car (last-played-stone)) 1) . ,(cdr (last-played-stone))))]
+         [row-str (apply string-append (map (lambda (piece-point)
+                                              (if (equal? (cdr piece-point) left-of)
+                                                  (new-display-piece piece-point #t)
+                                                  (new-display-piece piece-point))) row))])
+    (when (not (null? left-of))
+      (printf "~a\n" left-of))
+    (string-append (if (< (+ 1 row-num) 10) " " "")
+                   (number->string (+ 1 row-num))
+                   " "
+                   row-str
+                   (if (< (+ 1 row-num) 10) " " "")
+                   (number->string  (+ 1 row-num)) "\n")))
 
 
+;; formatting is still off, pieces being displayed in reverse
 (define (new-print-board board)
-  (let* ([points (for*/list ([i (range 19)] [j (range 19)])
+  (let* ([points (for*/list ([i (range 18 -1 -1)] [j (range 19)])
                    (cons i j))]
          [board-point-pairs (zip (flatten board) points)])
     (printf "Captured white stones: ~a\n" (captured-white-stones))
     (printf "Captured black stones: ~a\n" (captured-black-stones))
     (newline)
     (printf "   A B C D E F G H I J K L M N O P Q R S\n")
-    ;; cut board-point-pairs into chunks of 19, map that list
-    ;; over to new-print-row
-    ;; (printf (map new-print-row board-point-pairs))
+    (printf (apply string-append (map new-print-row (split-into-chunks 19 board-point-pairs))))
     (printf "   A B C D E F G H I J K L M N O P Q R S\n")))
 
 
@@ -157,6 +181,13 @@
    down to a flat list, removing duplicates"
   (remove-duplicates (flatten1 complex-list)))
 
+
+(define (split-into-chunks n xs)
+  (if (null? xs)
+      '()
+      (let ((first-chunk (take xs n))
+            (rest (drop xs n)))
+        (cons first-chunk (split-into-chunks n rest)))))
 
 ;;; should be able to accomplish this with a fold
 ;;; thread-through :: a -> (a -> b -> a) -> [a] -> a

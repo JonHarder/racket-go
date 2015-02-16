@@ -33,7 +33,6 @@
 (define (score-game board)
   (printf "Both players passed. Game is done.\n"))
 
-
 (define (play board player)
   (newline)
   (new-print-board board)
