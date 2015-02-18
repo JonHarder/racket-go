@@ -59,9 +59,6 @@
                         (equal? piece 'empty))
                    "+"
                    (hash-ref piece-hash piece))])
-    ;; never hit as far as I can tell
-    (when is-left-of
-        (printf "~a is left of last played: ~a\n" (cdr piece-point-pair) is-left-of))
     (cond
       [(equal? point last-played) (string-join (list repr) #:before-first "("
                                                #:after-last ")")]
@@ -71,17 +68,15 @@
 
 (define (new-print-row row)
   "find left of last played, right of last played, only buffer whitespace"
-  ;; piece-point = (piece x . y)
-  ;; thus (car piece-point) = piece
-  ;; and (cdr piece-point) = (x . y)
-  (let* ([row-num (car (cdr (car row)))]
+  (let* ([row-num (cdr (cdr (car row)))]
          [left-of (if (null? (last-played-stone)) '() `(,(- (car (last-played-stone)) 1) . ,(cdr (last-played-stone))))]
          [row-str (apply string-append (map (lambda (piece-point)
-                                              (if (equal? (cdr piece-point) left-of)
-                                                  (new-display-piece piece-point #t)
-                                                  (new-display-piece piece-point))) row))])
-    (when (not (null? left-of))
-      (printf "~a\n" left-of))
+                                              (let* ([piece (car piece-point)]
+                                                     [point (cdr piece-point)]
+                                                     [reverse-point (cons (car point) (- (cdr point) 18))])
+                                                (if (equal? point left-of)
+                                                    (new-display-piece (cons piece reverse-point) #t)
+                                                    (new-display-piece (cons piece reverse-point))))) row))])
     (string-append (if (< (+ 1 row-num) 10) " " "")
                    (number->string (+ 1 row-num))
                    " "
@@ -90,10 +85,9 @@
                    (number->string  (+ 1 row-num)) "\n")))
 
 
-;; formatting is still off, pieces being displayed in reverse
 (define (new-print-board board)
   (let* ([points (for*/list ([i (range 18 -1 -1)] [j (range 19)])
-                   (cons i j))]
+                   (cons j i))]
          [board-point-pairs (zip (flatten board) points)])
     (printf "Captured white stones: ~a\n" (captured-white-stones))
     (printf "Captured black stones: ~a\n" (captured-black-stones))
