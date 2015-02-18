@@ -72,11 +72,10 @@
          [left-of (if (null? (last-played-stone)) '() `(,(- (car (last-played-stone)) 1) . ,(cdr (last-played-stone))))]
          [row-str (apply string-append (map (lambda (piece-point)
                                               (let* ([piece (car piece-point)]
-                                                     [point (cdr piece-point)]
-                                                     [reverse-point (cons (car point) (- (cdr point) 18))])
+                                                     [point (cdr piece-point)])
                                                 (if (equal? point left-of)
-                                                    (new-display-piece (cons piece reverse-point) #t)
-                                                    (new-display-piece (cons piece reverse-point))))) row))])
+                                                    (new-display-piece (cons piece point) #t)
+                                                    (new-display-piece (cons piece point))))) row))])
     (string-append (if (< (+ 1 row-num) 10) " " "")
                    (number->string (+ 1 row-num))
                    " "
@@ -94,7 +93,9 @@
     (newline)
     (printf "   A B C D E F G H I J K L M N O P Q R S\n")
     (printf (apply string-append (map new-print-row (split-into-chunks 19 board-point-pairs))))
-    (printf "   A B C D E F G H I J K L M N O P Q R S\n")))
+    (printf "   A B C D E F G H I J K L M N O P Q R S\n")
+    ;;(for ([p board-point-pairs]) (printf "~a\n" p))
+    ))
 
 
 (define (remove-piece board point)
