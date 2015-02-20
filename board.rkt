@@ -46,8 +46,6 @@
      (cons `(,(car l1) . ,(car l2)) (zip (cdr l1) (cdr l2)))]))
 
 (define (new-display-piece piece-point-pair [is-left-of #f])
-  "first check if last played is on this row, if not ignore, if yes,
-   find left and right stone"
   (let* ([piece (car piece-point-pair)]
          [point (cdr piece-point-pair)]
          [last-played (last-played-stone)]
@@ -68,33 +66,37 @@
 
 (define (new-print-row row)
   "find left of last played, right of last played, only buffer whitespace"
-  (let* ([row-num (cdr (cdr (car row)))]
-         [left-of (if (null? (last-played-stone)) '() `(,(- (car (last-played-stone)) 1) . ,(cdr (last-played-stone))))]
+  (let* ([row-num (+ 1 (cdr (cdr (car row))))]
+         [left-of (if (null? (last-played-stone)) '() (cons (- (car (last-played-stone)) 1) (cdr (last-played-stone))))]
          [row-str (apply string-append (map (lambda (piece-point)
                                               (let* ([piece (car piece-point)]
                                                      [point (cdr piece-point)])
                                                 (if (equal? point left-of)
-                                                    (new-display-piece (cons piece point) #t)
-                                                    (new-display-piece (cons piece point))))) row))])
-    (string-append (if (< (+ 1 row-num) 10) " " "")
-                   (number->string (+ 1 row-num))
+                                                    (new-display-piece piece-point #t)
+                                                    (new-display-piece piece-point)))) row))])
+    (string-append (if (< row-num 10) " " "")
+                   (number->string row-num)
                    " "
                    row-str
-                   (if (< (+ 1 row-num) 10) " " "")
-                   (number->string  (+ 1 row-num)) "\n")))
+                   (if (< row-num 10) " " "")
+                   (number->string  row-num) "\n")))
 
 
 (define (new-print-board board)
-  (let* ([points (for*/list ([i (range 18 -1 -1)] [j (range 19)])
+  ;; the pairs generated when zipped with the board, do not correspond to
+  ;; the points they are cons'd with
+  ;;
+  ;; specifically the x values (when the whole thing is reversed, are reversed
+  (let* ([points (for*/list ([i (range 19)] [j (range 18 -1 -1)])
                    (cons j i))]
-         [board-point-pairs (zip (flatten board) points)])
+         [board-point-pairs (reverse (zip (flatten board) points))])
     (printf "Captured white stones: ~a\n" (captured-white-stones))
     (printf "Captured black stones: ~a\n" (captured-black-stones))
     (newline)
     (printf "   A B C D E F G H I J K L M N O P Q R S\n")
     (printf (apply string-append (map new-print-row (split-into-chunks 19 board-point-pairs))))
     (printf "   A B C D E F G H I J K L M N O P Q R S\n")
-    ;;(for ([p board-point-pairs]) (printf "~a\n" p))
+    ; (for ([p board-point-pairs]) (printf "~a\n" p))
     ))
 
 
@@ -195,8 +197,6 @@
 (define captured-white-stones (make-parameter 0))
 (define captured-black-stones (make-parameter 0))
 
-;;; TODO wire in parameter to keep track of number and color
-;;; of captured stones
 (define (capture board point)
   "removes the piece and all connected pieces (if any)
    from the board, returning the new board without those pieces"
