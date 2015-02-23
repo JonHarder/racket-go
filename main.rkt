@@ -35,8 +35,7 @@
 
 (define (play board player)
   (newline)
-  ; (print-board board)
-  (new-print-board board)
+  (print-board board)
   (newline)
   (let ([move (if (and (computer-on?) (equal? player 'white))
                   (get-computer-move board player)
@@ -56,6 +55,7 @@
                 [else
                  (if new-board
                      (begin (num-passes 0)
+                            (move-count (+ 1 (move-count)))
                             (play new-board (next-turn player)))
                      (begin (printf "You can't place a ~a stone at ~a\n" (symbol->string player) move)
                             (play board player)))]))])))

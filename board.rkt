@@ -9,35 +9,6 @@
 (define last-played-stone (make-parameter '()))
 
 
-(define (display-piece piece [index #f])
-  (let ([repr (hash-ref (make-hash '((white . "O") (black . "X") (empty . "."))) piece)])
-    (if (and (equal? piece 'empty)
-             (member index '(3 9 15)))
-        "+"
-        repr)))
-
-
-(define (print-row n row)
-  (let ([row-str-list (if (member n '(3 9 15))
-                          (map (lambda (num) (display-piece (list-ref row num) num)) (range 19))
-                          (map display-piece row))]
-        [number-buf (if (< n 9)
-                        (string-append " " (number->string (+ 1 n)) " ")
-                        (string-append (number->string (+ 1 n)) " "))])
-    (printf "~a\n" (string-join row-str-list " "
-                                #:before-first number-buf
-                                #:after-last (string-append " " number-buf)))))
-
-
-(define (print-board board)
-  (printf "Captured white stones: ~a\n" (captured-white-stones))
-  (printf "Captured black stones: ~a\n" (captured-black-stones))
-  (newline)
-  (printf "   A B C D E F G H I J K L M N O P Q R S\n")
-  (for-each (lambda (n) (print-row n (list-ref board n)))
-            (range 18 -1 -1))
-  (printf "   A B C D E F G H I J K L M N O P Q R S\n"))
-
 (define (zip l1 l2)
   (cond
     [(null? l1) l2]
@@ -45,7 +16,7 @@
     [else
      (cons `(,(car l1) . ,(car l2)) (zip (cdr l1) (cdr l2)))]))
 
-(define (new-display-piece piece-point-pair [is-left-of #f])
+(define (display-piece piece-point-pair [is-left-of #f])
   (let* ([piece (car piece-point-pair)]
          [point (cdr piece-point-pair)]
          [last-played (last-played-stone)]
@@ -64,7 +35,7 @@
       [else (string-append repr " ")])))
 
 
-(define (new-print-row row)
+(define (print-row row)
   "find left of last played, right of last played, only buffer whitespace"
   (let* ([row-num (+ 1 (cdr (cdr (car row))))]
          ;; left-of represents the stone left of the last played stone of on the same
@@ -74,8 +45,8 @@
                                               (let* ([piece (car piece-point)]
                                                      [point (cdr piece-point)])
                                                 (if (equal? point left-of)
-                                                    (new-display-piece piece-point #t)
-                                                    (new-display-piece piece-point)))) row))])
+                                                    (display-piece piece-point #t)
+                                                    (display-piece piece-point)))) row))])
     (string-append (if (< row-num 10) " " "")
                    (number->string row-num)
                    (if (and (not (empty? left-of))
@@ -88,7 +59,7 @@
                    (number->string  row-num) "\n")))
 
 
-(define (new-print-board board)
+(define (print-board board)
   (let* ([points (for*/list ([i (range 18 -1 -1)] [j (range 19)])
                    (cons j i))]
          [board-point-pairs (zip (flatten (reverse board)) points)])
@@ -96,7 +67,7 @@
     (printf "Captured black stones: ~a\n" (captured-black-stones))
     (newline)
     (printf "   A B C D E F G H I J K L M N O P Q R S\n")
-    (printf (apply string-append (map new-print-row (split-into-chunks 19 board-point-pairs))))
+    (printf (apply string-append (map print-row (split-into-chunks 19 board-point-pairs))))
     (printf "   A B C D E F G H I J K L M N O P Q R S\n")))
 
 
