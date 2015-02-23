@@ -35,8 +35,7 @@
 
 (define (play board player)
   (newline)
-  ; (print-board board)
-  (new-print-board board)
+  (print-board board)
   (newline)
   (let ([move (if (and (computer-on?) (equal? player 'white))
                   (get-computer-move board player)
