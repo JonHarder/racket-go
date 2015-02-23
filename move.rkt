@@ -1,7 +1,9 @@
 #lang racket
 
 (provide get-move)
+(provide move-count)
 
+(define move-count (make-parameter 1))
 
 (define (pop-letter str)
   (let ([str-list (string->list str)])
@@ -32,11 +34,11 @@
 
 (define (display-player player)
   (cond
-    [(equal? player 'white) "White"]
-    [(equal? player 'black) "Black"]))
+    [(equal? player 'white) "white"]
+    [(equal? player 'black) "black"]))
 
 (define (get-move player)
-  (printf "Enter move ~a: " (display-player player))
+  (printf "~a(~a): " (display-player player) (move-count))
   (let ([raw-response (read)])
     (if (member raw-response '(exit pass save))
         raw-response
@@ -45,4 +47,4 @@
                 (begin
                   (printf "Invalid move\nMoves should be of the form [number][letter]\nExample: D12 or f3\n")
                   (get-move player))
-                move)))))
+                  move)))))

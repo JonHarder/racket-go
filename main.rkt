@@ -56,6 +56,7 @@
                 [else
                  (if new-board
                      (begin (num-passes 0)
+                            (move-count (+ 1 (move-count)))
                             (play new-board (next-turn player)))
                      (begin (printf "You can't place a ~a stone at ~a\n" (symbol->string player) move)
                             (play board player)))]))])))
