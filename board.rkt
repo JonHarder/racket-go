@@ -67,6 +67,8 @@
 (define (new-print-row row)
   "find left of last played, right of last played, only buffer whitespace"
   (let* ([row-num (+ 1 (cdr (cdr (car row))))]
+         ;; left-of represents the stone left of the last played stone of on the same
+         ;; row as it, otherwise '()
          [left-of (if (null? (last-played-stone)) '() (cons (- (car (last-played-stone)) 1) (cdr (last-played-stone))))]
          [row-str (apply string-append (map (lambda (piece-point)
                                               (let* ([piece (car piece-point)]
@@ -76,7 +78,11 @@
                                                     (new-display-piece piece-point)))) row))])
     (string-append (if (< row-num 10) " " "")
                    (number->string row-num)
-                   " "
+                   (if (and (not (empty? left-of))
+                            (equal? (car left-of) -1)
+                            (equal? row-num (+ (cdr left-of) 1)))
+                       ""
+                       " ")
                    row-str
                    (if (< row-num 10) " " "")
                    (number->string  row-num) "\n")))
