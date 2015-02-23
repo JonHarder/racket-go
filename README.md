@@ -5,7 +5,7 @@
 19 . . . . . . . . . . . . . . . . . . . 19
 18 . . . . . . . . . . . . . . . . . . . 18
 17 . . . . . . . . . . . . . . . . . . . 17
-16 . . . + . . . . . + . . . . . + . . . 16
+16 . .(X)+ . . . . . + . . . . . + . . . 16
 15 . . . . . . . . . . . . . . . . . . . 15
 14 . . . . . . . . . . . . . . . . . . . 14
 13 . . . . . . . . . . . . . . . . . . . 13
@@ -16,24 +16,28 @@
  8 . . . . . . . . . . . . . . . . . . .  8
  7 . . . . . . . . . . . . . . . . . . .  7
  6 . . . . . . . . . . . . . . . . . . .  6
- 5 . . . . . . . . . . . . . . . . . . .  5
+ 5 . . . . . . . . . . . . . . . O . . .  5
  4 . . . X . . . . . + . . . . . + . . .  4
  3 . . . . . . . . . . . . . . . . . . .  3
  2 . . . . . . . . . . . . . . . . . . .  2
  1 . . . . . . . . . . . . . . . . . . .  1
    A B C D E F G H I J K L M N O P Q R S
 
-Enter move Black: D4
+Enter move Black: C16
 ```
 
 # Usage:
 
 ```
-go [ <option> ... ]
+main.rkt [ <option> ... ]
  where <option> is one of
-  -l <file>, --load <file> : Load save file to continue previous game
+  -l <file>, --load <file> : Load save file to continue previous game, default save location is ~/go.save
+  -c, --computer : Play against a computer opponent (Just picks randomly for now)
+/ -s, --server : [NOT IMPLEMENTED] Run as a server for someone to connect to
+\ -r <ip>, --remote <ip> : [NOT IMPLEMENTED] Connect to ip of computer running racket-go as a server
   --help, -h : Show this help
   -- : Do not treat any remaining argument as a switch (at this level)
+ /|\ Brackets indicate mutually exclusive options.
  Multiple single-letter switches can be combined after one `-'; for
   example: `-h-' is the same as `-h --'
 ```
@@ -50,6 +54,7 @@ go [ <option> ... ]
     - capturing
     - track number of captured stones per player
     - game termination when both players pass consecutively
+	- last played stone indicator (X)
 
 # TODO:
   - changing names of players, etc.
@@ -58,4 +63,3 @@ go [ <option> ... ]
   - game timer
   - keep game tree to move forward/backward/laterally in game state
   - load and save smart game format files
-  - add parenthesis around last played stone (X)
