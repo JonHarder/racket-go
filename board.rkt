@@ -83,21 +83,15 @@
 
 
 (define (new-print-board board)
-  ;; the pairs generated when zipped with the board, do not correspond to
-  ;; the points they are cons'd with
-  ;;
-  ;; specifically the x values (when the whole thing is reversed, are reversed
-  (let* ([points (for*/list ([i (range 19)] [j (range 18 -1 -1)])
+  (let* ([points (for*/list ([i (range 18 -1 -1)] [j (range 19)])
                    (cons j i))]
-         [board-point-pairs (reverse (zip (flatten board) points))])
+         [board-point-pairs (zip (flatten (reverse board)) points)])
     (printf "Captured white stones: ~a\n" (captured-white-stones))
     (printf "Captured black stones: ~a\n" (captured-black-stones))
     (newline)
     (printf "   A B C D E F G H I J K L M N O P Q R S\n")
     (printf (apply string-append (map new-print-row (split-into-chunks 19 board-point-pairs))))
-    (printf "   A B C D E F G H I J K L M N O P Q R S\n")
-    ; (for ([p board-point-pairs]) (printf "~a\n" p))
-    ))
+    (printf "   A B C D E F G H I J K L M N O P Q R S\n")))
 
 
 (define (remove-piece board point)
