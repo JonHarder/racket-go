@@ -63,3 +63,5 @@ main.rkt [ <option> ... ]
   - game timer
   - keep game tree to move forward/backward/laterally in game state
   - load and save smart game format files
+  - save game should keep track of turn count and correctly display last played stone
+    (this should be covered in sgf format game save overhaul
