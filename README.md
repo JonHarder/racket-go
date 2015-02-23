@@ -23,7 +23,7 @@
  1 . . . . . . . . . . . . . . . . . . .  1
    A B C D E F G H I J K L M N O P Q R S
 
-Enter move Black: C16
+Black(3): C16
 ```
 
 # Usage:
