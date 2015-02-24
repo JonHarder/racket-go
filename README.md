@@ -55,6 +55,7 @@ main.rkt [ <option> ... ]
     - track number of captured stones per player
     - game termination when both players pass consecutively
 	- last played stone indicator (X)
+	- save game in sgf
 
 # TODO:
   - changing names of players, etc.
@@ -62,8 +63,8 @@ main.rkt [ <option> ... ]
   - Graphical interface
   - game timer
   - keep game tree to move forward/backward/laterally in game state
-  - load and save smart game format files
+  - load and save smart game format files (saving works)
       - black and white player names respected in save file as well as
 	    board drawing/move prompts PB (player black) and PW (player white)
-      - current player can be set by turn to play PL
-      - move number can be set by MN
+      - ~~current player can be set by turn to play PL~~
+      - ~~move number can be set by MN~~
