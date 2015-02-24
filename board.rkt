@@ -1,6 +1,7 @@
 #lang racket
 
 ;; board.rkt
+(require "move.rkt")
 
 (provide (all-defined-out))
 
@@ -255,19 +256,37 @@
             (cons new-board #t)))))
 
 
-(define (translage-point-to-sgf point)
-  #f
- )
+(define (number->letter num)
+  (list-ref '("a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s") num))
+
+(define (translate-point-to-sgf piece-point)
+  (let* ([piece (car piece-point)]
+         [point (cdr piece-point)]
+         [sgf-point (string-append (number->letter (car point)) (number->letter (- 18 (cdr point))))])
+    (string-append
+     (cond
+       [(equal? (car piece-point) 'white) (string-append ";W[" sgf-point "]")]
+       [(equal? (car piece-point) 'black) (string-append ";B[" sgf-point "]")]
+       [else ""]))))
 
 (define (sgf-save-game board player [location #f])
   (printf "Saving game...\n")
-  (let ([black (captured-white-stones)]
-        [white (captured-black-stones)]
-        [out (open-output-file "save.sgf" #:exists 'replace)])
+  (let* ([black (captured-white-stones)]
+         [white (captured-black-stones)]
+         [out (open-output-file "save.sgf" #:exists 'replace)]
+         [points (for*/list ([i (range 18 -1 -1)] [j (range 19)])
+                   (cons j i))]
+         [board-point-pairs (zip (flatten (reverse board)) points)])
     (display "(;FF[4]GM[1]SZ[19]" out)
     (newline out)
-    (display "PB[Black]PW[White]" out)
-    (display ";B[pd];W[dp]C[Hello world])" out)
+    (display (cond [(equal? player 'white) "PL[white]"]
+                   [(equal? player 'black) "PL[black]"]
+                   [else ""]) out)
+    (fprintf out "MN[~a]" (move-count))
+    (newline out)
+    (for/list ([p board-point-pairs])
+      (display (translate-point-to-sgf p) out))
+    (display ")" out)
     (newline out)))
 
 

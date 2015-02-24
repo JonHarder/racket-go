@@ -41,7 +41,7 @@
                   (get-computer-move board player)
                   (get-move player))])
     (cond
-      [(equal? move 'save) (save-game board player)]
+      [(equal? move 'save) (sgf-save-game board player)]
       [(equal? move 'exit) (printf "Bye!\n")]
       [(equal? move 'pass) (begin (num-passes (+ 1 (num-passes)))
                                   (if (>= (num-passes) 2)
