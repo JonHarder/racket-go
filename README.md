@@ -63,3 +63,7 @@ main.rkt [ <option> ... ]
   - game timer
   - keep game tree to move forward/backward/laterally in game state
   - load and save smart game format files
+      - black and white player names respected in save file as well as
+	    board drawing/move prompts PB (player black) and PW (player white)
+      - current player can be set by turn to play PL
+      - move number can be set by MN

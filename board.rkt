@@ -47,7 +47,8 @@
                                                 (if (equal? point left-of)
                                                     (display-piece piece-point #t)
                                                     (display-piece piece-point)))) row))])
-    (string-append (if (< row-num 10) " " "")
+    (string-append " "
+                   (if (< row-num 10) " " "")
                    (number->string row-num)
                    (if (and (not (empty? left-of))
                             (equal? (car left-of) -1)
@@ -63,12 +64,12 @@
   (let* ([points (for*/list ([i (range 18 -1 -1)] [j (range 19)])
                    (cons j i))]
          [board-point-pairs (zip (flatten (reverse board)) points)])
-    (printf "Captured white stones: ~a\n" (captured-white-stones))
-    (printf "Captured black stones: ~a\n" (captured-black-stones))
+    (printf "    Captured white stones: ~a\n" (captured-white-stones))
+    (printf "    Captured black stones: ~a\n" (captured-black-stones))
     (newline)
-    (printf "   A B C D E F G H I J K L M N O P Q R S\n")
+    (printf "    A B C D E F G H I J K L M N O P Q R S\n")
     (printf (apply string-append (map print-row (split-into-chunks 19 board-point-pairs))))
-    (printf "   A B C D E F G H I J K L M N O P Q R S\n")))
+    (printf "    A B C D E F G H I J K L M N O P Q R S\n")))
 
 
 (define (remove-piece board point)
@@ -252,6 +253,22 @@
         (if (suicide? new-board point piece)
             'suicide
             (cons new-board #t)))))
+
+
+(define (translage-point-to-sgf point)
+  #f
+ )
+
+(define (sgf-save-game board player [location #f])
+  (printf "Saving game...\n")
+  (let ([black (captured-white-stones)]
+        [white (captured-black-stones)]
+        [out (open-output-file "save.sgf" #:exists 'replace)])
+    (display "(;FF[4]GM[1]SZ[19]" out)
+    (newline out)
+    (display "PB[Black]PW[White]" out)
+    (display ";B[pd];W[dp]C[Hello world])" out)
+    (newline out)))
 
 
 (define (save-game board player [location #f])
