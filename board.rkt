@@ -2,6 +2,7 @@
 
 ;; board.rkt
 (require "move.rkt")
+(require "parser.rkt")
 
 (provide (all-defined-out))
 
@@ -261,6 +262,9 @@
 (define (number->letter num)
   (list-ref '("a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s") num))
 
+(define (letter->number letter)
+  (hash-ref (make-hash (zip (string->list "abcdefghijklmnopqrs") (range 19))) letter))
+
 (define (translate-point-to-sgf piece-point)
   (let* ([piece (car piece-point)]
          [point (cdr piece-point)]
@@ -270,6 +274,10 @@
        [(equal? (car piece-point) 'white) (string-append ";W[" sgf-point "]")]
        [(equal? (car piece-point) 'black) (string-append ";B[" sgf-point "]")]
        [else ""]))))
+
+(define (sgf-point-to-point point)
+  (cons (letter->number (first point)) (- 18 (letter->number (second point)))))
+
 
 (define (sgf-save-game board player [location #f])
   (printf "Saving game...\n")
@@ -299,6 +307,19 @@
           (display-to-file (list `(,black . ,white) player board) path #:exists 'replace)))
     (printf "Done saving game.\n")))
 
+(define (sgf-load-game [location #f] [board initial-board])
+  (let ([nodes (parse-game (if location
+                                  location
+                                  "save.sgf"))])
+    (void (for*/list ([attributes nodes]
+                     [attr attributes])
+          (cond
+            [(equal? (attribute-name attr) 'B) (begin (printf "Playing black at ~a\n"
+                                                              (sgf-point-to-point (attribute-value attr)))
+                                                      (move-list #f))]
+            [(equal? (attribute-name attr) 'W) (printf "Playing white at ~a\n"
+                                                       (sgf-point-to-point (attribute-value attr)))]
+            [else (printf "~a: ~a\n" (attribute-name attr) (attribute-value attr))])))))
 
 (define (load-game [path #f])
   "takes (optional) file path and returns (list player board)"

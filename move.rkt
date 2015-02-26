@@ -3,7 +3,7 @@
 (provide get-move)
 (provide move-count)
 
-(define move-count (make-parameter 1))
+(define move-count (make-parameter 0))
 
 (define (pop-letter str)
   (let ([str-list (string->list str)])

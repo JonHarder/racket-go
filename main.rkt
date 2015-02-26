@@ -1,10 +1,10 @@
 #lang racket
 
-(require "move.rkt")
-(require "board.rkt")
-(require "computer.rkt")
-(require "server.rkt")
-(require "client.rkt")
+(require "move.rkt"
+         "board.rkt"
+         "computer.rkt"
+         "server.rkt"
+         "client.rkt")
 
 (define (letter->number letter)
   (let* ([letter-list (map string (string->list "ABCDEFGHIJKLMNOPQRS"))]
