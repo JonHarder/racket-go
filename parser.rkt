@@ -12,10 +12,12 @@
 
 
 (define (make-attribute name-list val-list)
-  (attribute (string->symbol (list->string name-list))
-             (if (> (length val-list) 2)
-                 (list->string val-list)
-                 val-list)))
+  (let ([name (string->symbol (list->string name-list))])
+    (attribute name (if (member name '(SZ MN FF GM))
+                        (string->number (list->string val-list))
+                        (if (> (length val-list) 2)
+                            (list->string val-list)
+                            val-list)))))
 
 (define $attribute-name (many1 $letter))
 

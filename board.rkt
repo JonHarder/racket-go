@@ -262,8 +262,8 @@
 (define (number->letter num)
   (list-ref '("a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s") num))
 
-(define (letter->number letter)
-  (hash-ref (make-hash (zip (string->list "abcdefghijklmnopqrs") (range 19))) letter))
+;; (define (letter->number letter)
+;;   (hash-ref (make-hash (zip (string->list "abcdefghijklmnopqrs") (range 19))) letter))
 
 (define (translate-point-to-sgf piece-point)
   (let* ([piece (car piece-point)]
