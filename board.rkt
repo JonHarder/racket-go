@@ -9,6 +9,7 @@
 
 (define last-played-stone (make-parameter '()))
 
+(define move-list (make-parameter ""))
 
 (define (zip l1 l2)
   (cond
@@ -106,6 +107,7 @@
        (if (cdr result)
            (begin (last-played-stone point)
                   (previous-board-states (cons (car result) (previous-board-states)))
+                  (move-list (string-append (move-list) (translate-point-to-sgf (cons piece point))))
                   (car result))
            #f)])))
 
@@ -273,10 +275,7 @@
   (printf "Saving game...\n")
   (let* ([black (captured-white-stones)]
          [white (captured-black-stones)]
-         [out (open-output-file "save.sgf" #:exists 'replace)]
-         [points (for*/list ([i (range 18 -1 -1)] [j (range 19)])
-                   (cons j i))]
-         [board-point-pairs (zip (flatten (reverse board)) points)])
+         [out (open-output-file "save.sgf" #:exists 'replace)])
     (display "(;FF[4]GM[1]SZ[19]" out)
     (newline out)
     (display (cond [(equal? player 'white) "PL[white]"]
@@ -284,8 +283,7 @@
                    [else ""]) out)
     (fprintf out "MN[~a]" (move-count))
     (newline out)
-    (for/list ([p board-point-pairs])
-      (display (translate-point-to-sgf p) out))
+    (display (move-list) out)
     (display ")" out)
     (newline out)))
 
